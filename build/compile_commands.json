@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/xertion/Code/My_STL/build/tests",
+  "command": "/usr/bin/g++  -I/home/xertion/Code/My_STL/include  -Wall -Wextra -g -fsanitize=address -g -std=c++17 -o CMakeFiles/test_allocator.dir/test_allocator.cpp.o -c /home/xertion/Code/My_STL/tests/test_allocator.cpp",
+  "file": "/home/xertion/Code/My_STL/tests/test_allocator.cpp",
+  "output": "tests/CMakeFiles/test_allocator.dir/test_allocator.cpp.o"
+}
+]
