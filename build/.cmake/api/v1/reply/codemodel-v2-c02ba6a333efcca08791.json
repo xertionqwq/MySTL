@@ -44,7 +44,8 @@
 					"source" : "tests",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -64,7 +65,8 @@
 					"name" : "My_STL",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -73,8 +75,15 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "test_allocator::@a44f0ac069e85531cdee",
-					"jsonFile" : "target-test_allocator-Debug-4eaf3116196aa045babd.json",
+					"jsonFile" : "target-test_allocator-Debug-796da2c29482ef4f27f4.json",
 					"name" : "test_allocator",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "test_vector::@a44f0ac069e85531cdee",
+					"jsonFile" : "target-test_vector-Debug-79da7ced1929e7c3079a.json",
+					"name" : "test_vector",
 					"projectIndex" : 0
 				}
 			]

@@ -139,6 +139,19 @@ test_allocator/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_allocator.dir/build.make tests/CMakeFiles/test_allocator.dir/build
 .PHONY : test_allocator/fast
 
+#=============================================================================
+# Target rules for targets named test_vector
+
+# Build rule for target.
+test_vector: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_vector
+.PHONY : test_vector
+
+# fast build rule for target.
+test_vector/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/build
+.PHONY : test_vector/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -149,6 +162,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... test_allocator"
+	@echo "... test_vector"
 .PHONY : help
 
 

@@ -140,6 +140,20 @@ test_allocator/fast:
 	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_allocator.dir/build.make tests/CMakeFiles/test_allocator.dir/build
 .PHONY : test_allocator/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_vector.dir/rule:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_vector.dir/rule
+.PHONY : tests/CMakeFiles/test_vector.dir/rule
+
+# Convenience name for target.
+test_vector: tests/CMakeFiles/test_vector.dir/rule
+.PHONY : test_vector
+
+# fast build rule for target.
+test_vector/fast:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/build
+.PHONY : test_vector/fast
+
 test_allocator.o: test_allocator.cpp.o
 .PHONY : test_allocator.o
 
@@ -164,6 +178,30 @@ test_allocator.cpp.s:
 	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_allocator.dir/build.make tests/CMakeFiles/test_allocator.dir/test_allocator.cpp.s
 .PHONY : test_allocator.cpp.s
 
+test_vector.o: test_vector.cpp.o
+.PHONY : test_vector.o
+
+# target to build an object file
+test_vector.cpp.o:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/test_vector.cpp.o
+.PHONY : test_vector.cpp.o
+
+test_vector.i: test_vector.cpp.i
+.PHONY : test_vector.i
+
+# target to preprocess a source file
+test_vector.cpp.i:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/test_vector.cpp.i
+.PHONY : test_vector.cpp.i
+
+test_vector.s: test_vector.cpp.s
+.PHONY : test_vector.s
+
+# target to generate assembly for a file
+test_vector.cpp.s:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/test_vector.cpp.s
+.PHONY : test_vector.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -174,9 +212,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... test_allocator"
+	@echo "... test_vector"
 	@echo "... test_allocator.o"
 	@echo "... test_allocator.i"
 	@echo "... test_allocator.s"
+	@echo "... test_vector.o"
+	@echo "... test_vector.i"
+	@echo "... test_vector.s"
 .PHONY : help
 
 

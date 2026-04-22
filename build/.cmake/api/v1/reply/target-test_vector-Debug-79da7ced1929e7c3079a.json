@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "tests/test_allocator"
+			"path" : "tests/test_vector"
 		}
 	],
 	"backtrace" : 1,
@@ -25,13 +25,13 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 2,
+				"line" : 3,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 5,
+				"line" : 7,
 				"parent" : 0
 			}
 		]
@@ -79,7 +79,7 @@
 			]
 		}
 	],
-	"id" : "test_allocator::@a44f0ac069e85531cdee",
+	"id" : "test_vector::@a44f0ac069e85531cdee",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -98,8 +98,8 @@
 			"id" : "my_stl::@6890427a1f51a3e7e1df"
 		}
 	],
-	"name" : "test_allocator",
-	"nameOnDisk" : "test_allocator",
+	"name" : "test_vector",
+	"nameOnDisk" : "test_vector",
 	"paths" : 
 	{
 		"build" : "tests",
@@ -120,7 +120,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "tests/test_allocator.cpp",
+			"path" : "tests/test_vector.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

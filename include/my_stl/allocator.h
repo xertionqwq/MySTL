@@ -74,7 +74,7 @@ namespace MySTL{
         MySTL::destroy(ptr); // 调用全局析构函数
     }
     template<class T>
-    void allocator<T>::destroy(T *first, T*last) {
+    void allocator<T>::destroy(T *first, T *last) {
         MySTL::destroy(first, last); // 调用全局析构函数
     }
 };
