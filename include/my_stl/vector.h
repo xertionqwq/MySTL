@@ -76,8 +76,9 @@ namespace MySTL
         void pop_back();
         void clear();
         void swap(_vector &other);
-        iterator erase(iterator positon);
-        iterator insert(iterator postion, const_reference value);
+        iterator erase(iterator position);
+        iterator insert(iterator position, const_reference value);
+        iterator insert(iterator position, size_type n, const_reference value);
 
         //----------配置器操作---------
         // Alloc get_allocator() { return dataAllocator; }
@@ -86,6 +87,8 @@ namespace MySTL
         template <class InputIterator>
         void allocate_and_copy(InputIterator first, InputIterator last);
         void deallocate();
+    private:
+        void insert_aux(iterator position, const_reference value);
     };
 };
 

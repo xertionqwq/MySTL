@@ -62,7 +62,7 @@ namespace MySTL{
                                 const T &value, _false_type);
     // 顶层接口函数
     template <class ForwardIterator, class T>
-    void _uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value) {
+    void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value) {
         using isPODType = typename _type_traits<T>::is_POD_type; // 萃取型别特征
         _unintialized_fill_aux(first, last, value, isPODType{});
     }
@@ -100,7 +100,7 @@ namespace MySTL{
                                               const T &value, _false_type);
     // 顶层接口函数
     template<class ForwardIterator, class Size, class T>
-    ForwardIterator _uninitialize_fill_n(ForwardIterator first, Size n, const T &value) {
+    ForwardIterator uninitialize_fill_n(ForwardIterator first, Size n, const T &value) {
         using isPODType = typename _type_traits<T>::is_POD_type;
         return _uninitialized_fill_n_aux(first, n, value, isPODType{});
     }
