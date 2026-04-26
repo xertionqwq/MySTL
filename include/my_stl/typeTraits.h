@@ -94,6 +94,15 @@ namespace MySTL{
     };  
 
     template<>
+    struct _type_traits<unsigned char>{
+        using has_trivial_default_constructor = _true_type;
+        using has_trivial_copy_constructor = _true_type;
+        using has_trivial_assignment_operator = _true_type;
+        using has_trivial_destructor = _true_type;
+        using is_POD_type = _true_type;
+    };  
+
+    template<>
     struct _type_traits<unsigned short>{
         using has_trivial_default_constructor = _true_type;
         using has_trivial_copy_constructor = _true_type;
@@ -121,6 +130,15 @@ namespace MySTL{
     }; 
     
     template<>
+    struct _type_traits<unsigned long>{
+        using has_trivial_default_constructor = _true_type;
+        using has_trivial_copy_constructor = _true_type;
+        using has_trivial_assignment_operator = _true_type;
+        using has_trivial_destructor = _true_type;
+        using is_POD_type = _true_type;
+    }; 
+
+    template<>
     struct _type_traits<long>{
         using has_trivial_default_constructor = _true_type;
         using has_trivial_copy_constructor = _true_type;
@@ -147,6 +165,15 @@ namespace MySTL{
         using has_trivial_destructor = _true_type;
         using is_POD_type = _true_type;
     }; 
+
+    template<>
+    struct _type_traits<float>{
+        using has_trivial_default_constructor = _true_type;
+        using has_trivial_copy_constructor = _true_type;
+        using has_trivial_assignment_operator = _true_type;
+        using has_trivial_destructor = _true_type;
+        using is_POD_type = _true_type;
+    };
 
     template<>
     struct _type_traits<double>{
