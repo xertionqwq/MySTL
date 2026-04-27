@@ -77,6 +77,7 @@ namespace MySTL
         void clear();
         void swap(_vector &other);
         iterator erase(iterator position);
+        iterator erase(iterator first, iterator last);
         iterator insert(iterator position, const_reference value);
         iterator insert(iterator position, size_type n, const_reference value);
 
@@ -89,6 +90,7 @@ namespace MySTL
         void deallocate();
     private:
         void insert_aux(iterator position, const_reference value);
+        void insert_aux(iterator first, iterator last, const_reference value);
     };
 };
 

@@ -133,7 +133,7 @@ namespace MySTL
         ForwardIterator start{first};
         try
         {
-            for (int i = 0; i < n; i++, first++)
+            for (size_t i = 0; i < n; i++, first++)
             {
                 construct(&*first, value);
             }

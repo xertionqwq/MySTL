@@ -161,7 +161,7 @@ namespace MySTL
         // 引导freeList指向新配置的空间(由内存池而来)
         *myFreeList = nextObj = reinterpret_cast<obj *>(chunk + bytes);
         // 串接个节点
-        for (int i = 1;; i++)
+        for (size_t i = 1;; i++)
         { // 从1开始, 0返回给用户
             currentObj = nextObj;
             nextObj = reinterpret_cast<obj *>(reinterpret_cast<char *>(nextObj) + bytes);
@@ -185,7 +185,7 @@ namespace MySTL
     {
         char *result{nullptr};
         size_t totalBytes{bytes * nobjs};
-        size_t bytesLeft{endFree - startFree};
+        ptrdiff_t bytesLeft{endFree - startFree};
 
         if (bytesLeft >= totalBytes)
         {

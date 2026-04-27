@@ -62,7 +62,13 @@ namespace MySTL
     }
 
     /*
-    ** copy_backward: 从尾部向前搬运数据
+    ** copy_backward: 将 [first, last) 的内容从尾部开始向前拷贝到以 result 为终点的空间
+    ** 拷贝方向：从 last-1 开始向前遍历，依次赋值到 result-1, result-2, ...
+    ** 使用场景：当目标区间与源区间重叠且目标在源右侧时，避免覆盖未拷贝的元素
+    ** 参数:
+    **   first, last — 源区间 [first, last)
+    **   result — 目标区间的**尾部迭代器**（即最后一个元素要放的位置的后一个位置）
+    ** 返回值: 目标区间的起始迭代器 (即 result - (last - first))
     */
     template <class BidirectionalIterator1, class BidirectionalIterator2>
     BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
