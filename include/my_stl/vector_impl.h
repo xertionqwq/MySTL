@@ -78,7 +78,15 @@ namespace MySTL
     template <class T, class Alloc>
     void vector<T, Alloc>::push_back(const_reference value)
     {
-        if (endOfStorage_ != finish_)
+        if (start_ == nullptr)
+        {
+            // 空 vector，分配初始容量
+            start_ = dataAllocator::allocate(1);
+            dataAllocator::construct(start_, value);
+            finish_ = start_ + 1;
+            endOfStorage_ = finish_;
+        }
+        else if (endOfStorage_ != finish_)
         {
             dataAllocator::construct(finish_, value);
             finish_++;
@@ -168,7 +176,10 @@ namespace MySTL
             // 先把末尾 n 个元素拷贝到尾部未初始化区
             uninitialized_copy(finish_ - n, finish_, finish_);
             // 然后把 [first, old_finish_) 整体后移到 [first + n, new_finish_)
-            MySTL::copy_backward(first, finish_ - n, finish_);
+            if (first != finish_)
+            {
+                MySTL::copy_backward(first, finish_ - n, finish_);
+            }
             // 最后填充空位
             MySTL::fill_n(first, n, value);
             finish_ += n;
@@ -182,10 +193,13 @@ namespace MySTL
             iterator new_finish_ = new_start_;
             try
             {
-                new_finish_ = uninitialized_copy(start_, first, new_start_);  // 移动插入前的元素
-                uninitialized_fill_n(new_finish_, n, value);                  // 批量构造插入元素
-                new_finish_ += n;                                             // 调整迭代器
-                new_finish_ = uninitialized_copy(last, finish_, new_finish_); // 移动插入后的元素
+                new_finish_ = uninitialized_copy(start_, first, new_start_); // 移动插入前的元素
+                uninitialized_fill_n(new_finish_, n, value);                 // 批量构造插入元素
+                new_finish_ += n;                                            // 调整迭代器
+                if (last < finish_)
+                {
+                    new_finish_ = uninitialized_copy(last, finish_, new_finish_); // 移动插入后的元素
+                }
             }
             catch (...)
             { // rollback
