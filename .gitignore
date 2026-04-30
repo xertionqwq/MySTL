@@ -1,5 +1,6 @@
 # help
 .continue
+.claude
 Bugfix.md
 CLAUDE.md
 
@@ -9,3 +10,5 @@ output/
 # others
 O_tinySTL
 
+# plan of structure
+skipList.md

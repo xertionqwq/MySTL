@@ -3,7 +3,7 @@
 PROJECT_DIR="/home/xertion/Code/My_STL"
 BUILD_DIR="$PROJECT_DIR/build"
 OUTPUT_DIR="$PROJECT_DIR/output"
-OUTPUT_FILE="$OUTPUT_DIR/run_log.md"
+OUTPUT_FILE="$OUTPUT_DIR/run_vector_log.md"
 
 mkdir -p "$OUTPUT_DIR"
 cd "$PROJECT_DIR" || exit 1

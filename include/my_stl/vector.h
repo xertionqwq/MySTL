@@ -36,12 +36,12 @@ namespace MySTL
         explicit vector(const size_type n);
         vector(const size_type n, const_reference value); // 初始化n个value对象
         vector(const _vector &other);                     // 拷贝构造
-        vector(_vector &&other);                          // 移动构造
+        vector(_vector &&other) noexcept;                 // 移动构造
         ~vector();
 
         //-----------重载操作符-------------
         _vector &operator=(const _vector &other);
-        _vector &operator=(_vector &&other);
+        _vector &operator=(_vector &&other) noexcept;
         bool operator==(const _vector &other) const;
         bool operator!=(const _vector &other) const;
 
@@ -75,7 +75,7 @@ namespace MySTL
         void push_back(const_reference value);
         void pop_back();
         void clear();
-        void swap(_vector &other);
+        void swap(_vector &other) noexcept;
         iterator erase(iterator position);
         iterator erase(iterator first, iterator last);
         iterator insert(iterator position, const_reference value);
@@ -89,6 +89,7 @@ namespace MySTL
         void allocate_and_copy(InputIterator first, InputIterator last);
         void deallocate();
     private:
+        //----------内部辅助扩容函数---------
         void insert_aux(iterator position, const_reference value);
         void insert_aux(iterator first, iterator last, const_reference value);
     };

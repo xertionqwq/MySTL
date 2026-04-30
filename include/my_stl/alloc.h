@@ -187,14 +187,14 @@ namespace MySTL
         size_t totalBytes{bytes * nobjs};
         ptrdiff_t bytesLeft{endFree - startFree};
 
-        if (bytesLeft >= totalBytes)
+        if (static_cast<size_t>(bytesLeft) >= totalBytes)
         {
             // 剩余空间完全满足需求量
             result = startFree;
             startFree += totalBytes;
             return result;
         }
-        else if (bytesLeft >= bytes)
+        else if (static_cast<size_t>(bytesLeft) >= bytes)
         {
             // 剩余空间不满足, 但可供应一个以上的区块
             nobjs = bytesLeft / bytes; // 分不出20个了， 改变nojbs

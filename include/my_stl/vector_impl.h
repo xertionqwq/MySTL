@@ -25,6 +25,12 @@ namespace MySTL
         allocate_and_copy(other.start_, other.finish_);
     }
     template <class T, class Alloc>
+    vector<T, Alloc>::vector(_vector &&other) noexcept
+        : start_(other.start_), finish_(other.finish_), endOfStorage_(other.endOfStorage_)
+    {
+        other.start_ = other.finish_ = other.endOfStorage_ = nullptr;
+    }
+    template <class T, class Alloc>
     vector<T, Alloc>::~vector()
     {
         deallocate();
@@ -73,6 +79,64 @@ namespace MySTL
         }
     }
 
+    //-----------重载操作符-------------
+    // copy-and-swap: 强异常保证, 自动处理容量和自赋值
+    template <class T, class Alloc>
+    auto vector<T, Alloc>::operator=(const _vector &other) -> _vector &
+    {
+        if (this != &other)
+        {
+            _vector tmp(other); // 拷贝构造, 抛异常则 *this 不受影响
+            this->swap(tmp);    // 交换指针, 绝不抛异常; tmp 析构回收旧资源
+        }
+        return *this;
+    }
+    template <class T, class Alloc>
+    auto vector<T, Alloc>::operator=(_vector &&other) noexcept -> _vector &
+    {
+        this->swap(other);
+        return *this;
+    }
+    // operator==: 逐个元素比较
+    template <class T, class Alloc>
+    bool vector<T, Alloc>::operator==(const _vector &other) const
+    {
+        if (size() != other.size())
+            return false;
+
+        iterator m_begin_ = start_;
+        iterator o_begin_ = other.start_;
+        for (; m_begin_ != finish_; m_begin_++, o_begin_++)
+        {
+            if (*m_begin_ != *o_begin_)
+                return false;
+        }
+
+        return true;
+    }
+    // operator!=: == 的逻辑逆
+    template <class T, class Alloc>
+    bool vector<T, Alloc>::operator!=(const _vector &other) const
+    {
+        return !(*this == other);
+    }
+
+    //----------访问元素操作-----------
+    template <class T, class Alloc>
+    typename vector<T, Alloc>::reference vector<T, Alloc>::at(size_type n)
+    {
+        if (n >= size())
+            throw std::out_of_range("vector::at: n >= size()");
+        return *(start_ + n);
+    }
+    template <class T, class Alloc>
+    typename vector<T, Alloc>::const_reference vector<T, Alloc>::at(size_type n) const
+    {
+        if (n >= size())
+            throw std::out_of_range("vector::at: n >= size()");
+        return *(start_ + n);
+    }
+
     //----------修改容器函数-----------
     // push_back: 尾部插入单值
     template <class T, class Alloc>
@@ -115,6 +179,20 @@ namespace MySTL
             dataAllocator::destroy(start_, finish_);
             finish_ = start_;
         }
+    }
+    // swap: 交换指针
+    template <class T, class Alloc>
+    void vector<T, Alloc>::swap(_vector &other) noexcept
+    {
+        iterator tmp = start_;
+        start_ = other.start_;
+        other.start_ = tmp;
+        tmp = finish_;
+        finish_ = other.finish_;
+        other.finish_ = tmp;
+        tmp = endOfStorage_;
+        endOfStorage_ = other.endOfStorage_;
+        other.endOfStorage_ = tmp;
     }
     // erase: 删除单个元素
     template <class T, class Alloc>
@@ -196,9 +274,9 @@ namespace MySTL
                 new_finish_ = uninitialized_copy(start_, first, new_start_); // 移动插入前的元素
                 uninitialized_fill_n(new_finish_, n, value);                 // 批量构造插入元素
                 new_finish_ += n;                                            // 调整迭代器
-                if (last < finish_)
+                if (first < finish_)
                 {
-                    new_finish_ = uninitialized_copy(last, finish_, new_finish_); // 移动插入后的元素
+                    new_finish_ = uninitialized_copy(first, finish_, new_finish_);
                 }
             }
             catch (...)
@@ -220,41 +298,41 @@ namespace MySTL
     template <class T, class Alloc>
     void vector<T, Alloc>::resize(size_type n, const_reference value)
     {
-        if (n <= size())
+        if (n < size())
         {
-            iterator new_finish_ = MySTL::fill_n(start_, n, value); // 填充对象
-            dataAllocator::destroy(new_finish_, finish_);           // 销毁多余部分
-            finish_ = new_finish_;                                  // 调整迭代器
+            dataAllocator::destroy(start_ + n, finish_);
+            finish_ = start_ + n;
         }
-        else if (n <= capacity())
+        else if (n > size())
         {
-            iterator new_finish_ = MySTL::fill_n(start_, size(), value); // 原对象全部覆盖
-            const size_type left_to_fill = n - size();
-            uninitialized_fill_n(new_finish_, left_to_fill, value); // 填充剩余元素
-            finish_ = start_ + n;                                   // 调整迭代器
-        }
-        else
-        {
-            // 扩容, 要么两倍, 要么n
-            const size_type new_size = size() * 2 > n ? size() * 2 : n;
-            iterator new_start_ = dataAllocator::allocate(new_size);
-            iterator new_finish_ = new_start_;
-            try
+            if (n <= capacity())
             {
-                new_finish_ = uninitialized_fill_n(new_start_, n, value);
+                uninitialized_fill_n(finish_, n - size(), value);
+                finish_ = start_ + n;
             }
-            catch (...)
-            { // rollback
-                dataAllocator::destroy(new_start_, new_finish_);
-                dataAllocator::deallocate(new_start_, new_size);
-                throw;
-            }
+            else
+            {
+                const size_type new_size = size() * 2 > n ? size() * 2 : n;
+                iterator new_start_ = dataAllocator::allocate(new_size);
+                iterator new_finish_ = new_start_;
+                try
+                {
+                    new_finish_ = uninitialized_copy(start_, finish_, new_start_);
+                    uninitialized_fill_n(new_finish_, n - size(), value);
+                    new_finish_ += n - size();
+                }
+                catch (...)
+                {
+                    dataAllocator::destroy(new_start_, new_finish_);
+                    dataAllocator::deallocate(new_start_, new_size);
+                    throw;
+                }
 
-            deallocate(); // 释放原vector
-            // 调整迭代器
-            start_ = new_start_;
-            finish_ = new_finish_;
-            endOfStorage_ = new_start_ + new_size;
+                deallocate();
+                start_ = new_start_;
+                finish_ = new_finish_;
+                endOfStorage_ = new_start_ + new_size;
+            }
         }
     }
 };

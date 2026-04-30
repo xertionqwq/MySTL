@@ -83,6 +83,188 @@ int main()
             FAIL("copy not independent");
     }
 
+    {
+        TEST("move construct: transfer ownership, source emptied");
+        MySTL::vector<int> v1(3, 7);
+        MySTL::vector<int> v2(std::move(v1));
+        bool ok = (v2.size() == 3 && v2[0] == 7 && v2[1] == 7 && v2[2] == 7);
+        if (!ok)
+            FAIL("moved-to vector has wrong data");
+        else if (!v1.isempty() || v1.size() != 0)
+            FAIL("moved-from vector not empty");
+        else if (v1.begin() != nullptr || v1.end() != nullptr)
+            FAIL("moved-from pointers not nulled");
+        else
+            PASS();
+    }
+
+    {
+        TEST("move-from can be reused via push_back");
+        MySTL::vector<int> v1(3, 10);
+        MySTL::vector<int> v2(std::move(v1));
+        v1.push_back(42);  // moved-from vector should accept new elements
+        if (v1.size() == 1 && v1[0] == 42)
+            PASS();
+        else
+            FAIL("moved-from vector not reusable");
+    }
+
+    {
+        TEST("swap exchanges data, size, and capacity");
+        MySTL::vector<int> v1(3, 1);  // [1,1,1]
+        MySTL::vector<int> v2(5, 9);  // [9,9,9,9,9]
+        size_t cap1 = v1.capacity();
+        size_t cap2 = v2.capacity();
+        v1.swap(v2);
+        bool ok = (v1.size() == 5 && v2.size() == 3);
+        for (size_t i = 0; i < v1.size() && ok; i++)
+            if (v1[i] != 9) ok = false;
+        for (size_t i = 0; i < v2.size() && ok; i++)
+            if (v2[i] != 1) ok = false;
+        if (!ok)
+            FAIL("data not exchanged");
+        else if (v1.capacity() != cap2 || v2.capacity() != cap1)
+            FAIL("capacity not exchanged");
+        else
+            PASS();
+    }
+
+    {
+        TEST("swap self is safe (no-op)");
+        MySTL::vector<int> v(3, 7);
+        v.swap(v);
+        if (v.size() == 3 && v[0] == 7)
+            PASS();
+        else
+            FAIL("self-swap corrupted data");
+    }
+
+    {
+        TEST("move assignment transfers data, empties source");
+        MySTL::vector<int> v1(3, 7);
+        MySTL::vector<int> v2;
+        v2 = std::move(v1);
+        bool ok = (v2.size() == 3 && v2[0] == 7 && v2[1] == 7 && v2[2] == 7);
+        if (!ok)
+            FAIL("assignee has wrong data");
+        else if (!v1.isempty() || v1.size() != 0)
+            FAIL("source not emptied");
+        else
+            PASS();
+    }
+
+    {
+        TEST("move assignment transfers data, source left valid");
+        MySTL::vector<int> v1(3, 1);
+        MySTL::vector<int> v2(5, 9);
+        v1 = std::move(v2);
+        // v1 now holds v2's old data; v2 is valid-but-unspecified (may hold old v1 data)
+        // v2's destructor will free whatever it holds; ASan catches leaks/double-free
+        if (v1.size() == 5 && v1[0] == 9)
+            PASS();
+        else
+            FAIL("move assignment corrupted state");
+    }
+
+    {
+        TEST("move self-assignment is safe");
+        MySTL::vector<int> v(3, 7);
+        v = std::move(v);
+        if (v.size() == 3 && v[0] == 7)
+            PASS();
+        else
+            FAIL("self-move-assign corrupted data");
+    }
+
+    //==============================================================
+    // 1b. 拷贝赋值 & 比较操作符
+    //==============================================================
+    {
+        TEST("copy assignment: values match, independence");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(3, 9);
+        v1 = v2;
+        bool ok = (v1.size() == 3 && v1[0] == 9 && v1[1] == 9 && v1[2] == 9);
+        // modify v2 to verify independence
+        v2[0] = 0;
+        if (ok && v1[0] == 9)
+            PASS();
+        else
+            FAIL("copy assign not independent");
+    }
+
+    {
+        TEST("copy assignment with capacity expansion");
+        MySTL::vector<int> v1(2, 1);
+        MySTL::vector<int> v2(5, 7);
+        size_t old_cap = v1.capacity();
+        v1 = v2;  // v1 has cap 2, v2 has 5 elements, must expand
+        if (v1.size() == 5 && v1[0] == 7 && v1[4] == 7 && v1.capacity() > old_cap)
+            PASS();
+        else
+            FAIL("capacity not expanded");
+    }
+
+    {
+        TEST("copy self-assignment is safe");
+        MySTL::vector<int> v(3, 7);
+        v = v;  // self-assign
+        if (v.size() == 3 && v[0] == 7)
+            PASS();
+        else
+            FAIL("self-copy-assign corrupted data");
+    }
+
+    {
+        TEST("operator==: equal vectors return true");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(3, 5);
+        if (v1 == v2)
+            PASS();
+        else
+            FAIL("equal vectors should compare equal");
+    }
+
+    {
+        TEST("operator==: different size returns false");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(5, 5);
+        if (!(v1 == v2))
+            PASS();
+        else
+            FAIL("different size should not compare equal");
+    }
+
+    {
+        TEST("operator==: same size, different values returns false");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(3, 9);
+        if (!(v1 == v2))
+            PASS();
+        else
+            FAIL("different values should not compare equal");
+    }
+
+    {
+        TEST("operator!=: equal vectors return false");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(3, 5);
+        if (!(v1 != v2))
+            PASS();
+        else
+            FAIL("equal vectors should not compare not-equal");
+    }
+
+    {
+        TEST("operator!=: different vectors return true");
+        MySTL::vector<int> v1(3, 5);
+        MySTL::vector<int> v2(3, 9);
+        if (v1 != v2)
+            PASS();
+        else
+            FAIL("different vectors should compare not-equal");
+    }
+
     //==============================================================
     // 2. push_back & pop_back
     //==============================================================
@@ -181,6 +363,51 @@ int main()
             FAIL("data() wrong");
     }
 
+    {
+        TEST("at(): valid index returns element");
+        MySTL::vector<int> v;
+        v.push_back(10);
+        v.push_back(20);
+        v.push_back(30);
+        if (v.at(0) == 10 && v.at(1) == 20 && v.at(2) == 30)
+            PASS();
+        else
+            FAIL("at() wrong value");
+    }
+
+    {
+        TEST("at(): out_of_range on n >= size()");
+        MySTL::vector<int> v(3, 1);
+        bool caught = false;
+        try { v.at(3); } catch (const std::out_of_range&) { caught = true; }
+        if (caught)
+            PASS();
+        else
+            FAIL("should throw out_of_range");
+    }
+
+    {
+        TEST("at(): out_of_range on empty vector");
+        MySTL::vector<int> v;
+        bool caught = false;
+        try { v.at(0); } catch (const std::out_of_range&) { caught = true; }
+        if (caught)
+            PASS();
+        else
+            FAIL("should throw out_of_range on empty");
+    }
+
+    {
+        TEST("const at(): valid index returns const_reference");
+        MySTL::vector<int> v;
+        v.push_back(42);
+        const MySTL::vector<int>& cv = v;
+        if (cv.at(0) == 42)
+            PASS();
+        else
+            FAIL("const at() wrong value");
+    }
+
     //==============================================================
     // 4. clear & isempty
     //==============================================================
@@ -221,10 +448,10 @@ int main()
     // 5. resize
     //==============================================================
     {
-        TEST("resize n < size(): truncate to n copies of value (fill_n + destroy)");
+        TEST("resize n < size(): truncate, keep original values");
         MySTL::vector<int> v(5, 10);
         v.resize(3, 42);
-        if (v.size() == 3 && v[0] == 42 && v[1] == 42 && v[2] == 42)
+        if (v.size() == 3 && v[0] == 10 && v[1] == 10 && v[2] == 10)
             PASS();
         else
             FAIL("wrong truncate");
@@ -263,13 +490,14 @@ int main()
         if (v.size() == 10 && v.capacity() > old_cap)
         {
             bool ok = true;
-            for (size_t i = 0; i < 10 && ok; i++)
-                if (v[i] != 7)
-                    ok = false;
+            // first 2 elements preserved, last 8 filled with 7
+            if (v[0] != 1 || v[1] != 1) ok = false;
+            for (size_t i = 2; i < 10 && ok; i++)
+                if (v[i] != 7) ok = false;
             if (ok)
                 PASS();
             else
-                FAIL("not all values 7");
+                FAIL("not all values correct");
         }
         else
         {
@@ -458,10 +686,11 @@ int main()
         TEST("endback() returns endOfStorage_");
         MySTL::vector<int> v;
         v.push_back(1);
-        if (v.endback() > v.end())
+        if (v.endback() >= v.end() &&
+            static_cast<size_t>(v.endback() - v.begin()) == v.capacity())
             PASS();
         else
-            FAIL("endback <= end");
+            FAIL("endback wrong");
     }
 
     //==============================================================
