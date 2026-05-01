@@ -1,8 +1,10 @@
 #ifndef _ALLOC_H_
 #define _ALLOC_H_
 
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <new>
 
 namespace MySTL
 {

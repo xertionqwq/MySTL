@@ -12,8 +12,9 @@ v.push_back(4);
 
 ```bash
 cd build && cmake .. && make -j$(nproc)   # 编译
-./tests/test_vector                        # 运行测试
-# 或一键: ./scripts/run_tests_vector.sh   # 输出到 output/run_vector_log.md
+./tests/test_vector                        # vector 测试
+./tests/test_skip_list                     # 跳表测试
+# 或一键: ./scripts/run_tests_vector.sh / run_tests_skip_list.sh
 ```
 
 编译选项：`-Wall -Wextra -g -fsanitize=address`。
@@ -24,39 +25,37 @@ cd build && cmake .. && make -j$(nproc)   # 编译
 include/my_stl/
 ├── alloc.h              # 二级空间配置器（内存池 + free-list）
 ├── allocator.h          # 类型安全封装，分离分配与构造
+├── concurrent_allocator.h # 线程安全封装，对 alloc 加 std::mutex
 ├── construct.h          # 对象构造/析构，基于 type_traits 分派
 ├── typeTraits.h         # 型别特征萃取（POD 判断）
 ├── iterator.h           # 迭代器萃取，五种标签
 ├── uninitialized.h      # 批量初始化（copy / fill / fill_n）
 ├── algorithm.h          # 基础算法（copy / copy_backward / fill / fill_n）
 ├── vector.h             # vector 声明
-└── vector_impl.h        # vector 实现
+├── vector_impl.h        # vector 实现
+├── skip_list.h          # 跳表声明（线程安全）
+└── skip_list_impl.h     # 跳表实现
 tests/
-├── test_vector.cpp      # 55 用例
+├── test_vector.cpp      # 54 用例
+├── test_skip_list.cpp   # 20 用例
 └── test_allocator.cpp   # 空壳，待编写
 scripts/
-└── run_tests_vector.sh
+├── run_tests_vector.sh
+└── run_tests_skip_list.sh
 ```
 
 ## 实现进度
 
 | 模块 | 状态 |
 |------|------|
-| 空间配置器（alloc / allocator） | ✅ |
+| 空间配置器（alloc / allocator / concurrent_allocator） | ✅ |
 | 类型萃取（typeTraits） | ✅ |
 | 迭代器萃取（iterator） | ✅ |
 | 构造/析构工具（construct） | ✅ |
 | 批量初始化（uninitialized） | ✅ |
 | 基础算法（algorithm） | ✅ |
-| vector — 构造/析构 | ✅ |
-| vector — push_back / pop_back / clear | ✅ |
-| vector — resize（标准语义） | ✅ |
-| vector — erase（单元素 + 区间） | ✅ |
-| vector — insert（单值 + n 值） | ✅ |
-| vector — 拷贝/移动构造与赋值 | ✅ |
-| vector — swap | ✅ |
-| vector — operator== / != | ✅ |
-| vector — at（边界检查） | ✅ |
+| vector — 全部（构造 + 拷贝/移动 + push_back 移动语义/resize/erase/insert/swap/比较/at） | ✅ |
+| skip_list — 全部（无锁 find + 乐观分配 insert + atomic 原子柔性数组 + 线程安全配置器） | ✅ |
 | list | ⬜ |
 | deque | ⬜ |
 
@@ -109,6 +108,36 @@ bool operator!=(const vector& other) const {
 }
 ```
 
+### 跳表节点：为什么用 `atomic<Node*> next_[1]` 柔性数组
+
+```cpp
+struct Node {
+    K key; V value; int height;
+    std::atomic<Node*> next_[1];   // 柔性数组锚点
+};
+```
+
+| 方案 | 分配次数 | height=1 浪费 | 缓存 | 无锁读 |
+|------|---------|-------------|------|--------|
+| `Node* forward[MAX_HEIGHT]` 固定数组 | 1 | 15 指针 × 8B = 120B | 好 | 需要额外 `atomic` 包装 |
+| `std::vector<Node*>` 外挂数组 | 2（node + vector 内部分配） | 无 | 差（两次间接访问） | 同上 |
+| `atomic<Node*> next_[1]` 柔性数组 | 1 | 无 | 最优（一次分配，紧邻缓存） | 原生 release/acquire |
+
+### 跳表 insert：为什么乐观分配（锁外 createNode）
+
+```
+线程 A:                                   线程 B:
+createNode(k,v,h)  ← 无锁并行             createNode(k,v,h)  ← 无锁并行
+  concurrent_allocator::allocate               concurrent_allocator::allocate
+  placement new key/value/next_               placement new key/value/next_
+                                               
+lock(mtx_)  ← 只做指针手术                lock(mtx_)  ← 等 A 释放
+  findInternal + forward 交换                  findInternal + forward 交换
+unlock(mtx_)                               unlock(mtx_)
+```
+
+对比锁内分配：分配器的 `std::mutex` + `malloc` 被串行化在结构锁之内，多线程分配退化为单线程。乐观分配让多线程并行备料，临界区只做 O(height) 次 `store`。
+
 ## 命名约定
 
 遵循 SGI STL 风格：
@@ -133,3 +162,4 @@ bool operator!=(const vector& other) const {
 - 侯捷《STL 源码剖析》
 - [SGI STL](https://github.com/steveLauwh/SGI-STL)
 - [LLVM libc++](https://github.com/llvm/llvm-project/tree/main/libcxx)
+- [LevelDB SkipList](https://github.com/google/leveldb/blob/main/db/skiplist.h) — 跳表节点的原子柔性数组参考

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <new>
+#include <utility>
 #include "typeTraits.h"
 #include "iterator.h"
 
@@ -17,6 +18,13 @@ namespace MySTL
     inline void construct(T1 *ptr, const T2 &value)
     {
         new (ptr) T1(value);
+    }
+
+    // 移动构造重载 (move-only 类型支持)
+    template <class T>
+    inline void construct(T *ptr, T &&value)
+    {
+        new (ptr) T(std::move(value));
     }
 
     template <class T> // 析构第一版, 单个直接析构

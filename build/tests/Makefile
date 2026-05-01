@@ -95,6 +95,51 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/opt/cmake-4.2.0-linux-x86_64/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
 # The main all target
 all: cmake_check_build_system
 	cd /home/xertion/Code/My_STL/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/xertion/Code/My_STL/build/CMakeFiles /home/xertion/Code/My_STL/build/tests//CMakeFiles/progress.marks
@@ -154,6 +199,20 @@ test_vector/fast:
 	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_vector.dir/build.make tests/CMakeFiles/test_vector.dir/build
 .PHONY : test_vector/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_skip_list.dir/rule:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_skip_list.dir/rule
+.PHONY : tests/CMakeFiles/test_skip_list.dir/rule
+
+# Convenience name for target.
+test_skip_list: tests/CMakeFiles/test_skip_list.dir/rule
+.PHONY : test_skip_list
+
+# fast build rule for target.
+test_skip_list/fast:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_skip_list.dir/build.make tests/CMakeFiles/test_skip_list.dir/build
+.PHONY : test_skip_list/fast
+
 test_allocator.o: test_allocator.cpp.o
 .PHONY : test_allocator.o
 
@@ -177,6 +236,30 @@ test_allocator.s: test_allocator.cpp.s
 test_allocator.cpp.s:
 	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_allocator.dir/build.make tests/CMakeFiles/test_allocator.dir/test_allocator.cpp.s
 .PHONY : test_allocator.cpp.s
+
+test_skip_list.o: test_skip_list.cpp.o
+.PHONY : test_skip_list.o
+
+# target to build an object file
+test_skip_list.cpp.o:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_skip_list.dir/build.make tests/CMakeFiles/test_skip_list.dir/test_skip_list.cpp.o
+.PHONY : test_skip_list.cpp.o
+
+test_skip_list.i: test_skip_list.cpp.i
+.PHONY : test_skip_list.i
+
+# target to preprocess a source file
+test_skip_list.cpp.i:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_skip_list.dir/build.make tests/CMakeFiles/test_skip_list.dir/test_skip_list.cpp.i
+.PHONY : test_skip_list.cpp.i
+
+test_skip_list.s: test_skip_list.cpp.s
+.PHONY : test_skip_list.s
+
+# target to generate assembly for a file
+test_skip_list.cpp.s:
+	cd /home/xertion/Code/My_STL/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_skip_list.dir/build.make tests/CMakeFiles/test_skip_list.dir/test_skip_list.cpp.s
+.PHONY : test_skip_list.cpp.s
 
 test_vector.o: test_vector.cpp.o
 .PHONY : test_vector.o
@@ -209,13 +292,21 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... test_allocator"
+	@echo "... test_skip_list"
 	@echo "... test_vector"
 	@echo "... test_allocator.o"
 	@echo "... test_allocator.i"
 	@echo "... test_allocator.s"
+	@echo "... test_skip_list.o"
+	@echo "... test_skip_list.i"
+	@echo "... test_skip_list.s"
 	@echo "... test_vector.o"
 	@echo "... test_vector.i"
 	@echo "... test_vector.s"

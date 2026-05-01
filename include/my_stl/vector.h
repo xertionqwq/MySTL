@@ -2,6 +2,10 @@
 #define _VECTOR_H_
 #pragma once
 
+#include <cstddef>
+#include <initializer_list>
+#include <stdexcept>
+
 #include "allocator.h"
 #include "iterator.h"
 
@@ -73,6 +77,7 @@ namespace MySTL
 
         //-----------修改容器操作------------
         void push_back(const_reference value);
+        void push_back(value_type&& value);
         void pop_back();
         void clear();
         void swap(_vector &other) noexcept;
@@ -91,6 +96,7 @@ namespace MySTL
     private:
         //----------内部辅助扩容函数---------
         void insert_aux(iterator position, const_reference value);
+        void insert_aux(iterator position, value_type&& value);
         void insert_aux(iterator first, iterator last, const_reference value);
     };
 };

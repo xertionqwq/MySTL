@@ -6,6 +6,7 @@
 #include "construct.h"
 
 #include <cassert>
+#include <cstddef>
 #include <new>
 #include <limits>
 
@@ -36,6 +37,7 @@ namespace MySTL{
         // 构造函数声明
         static void construct(T *ptr);
         static void construct(T *ptr, const T &value);
+        static void construct(T *ptr, T &&value);
         static void destroy(T *ptr);
         static void destroy(T *first, T *last);
     };
@@ -67,6 +69,10 @@ namespace MySTL{
     template<class T>
     void allocator<T>::construct(T *ptr, const T &value) {
         MySTL::construct(ptr, value); // 调用全局构造函数
+    }
+    template<class T>
+    void allocator<T>::construct(T *ptr, T &&value) {
+        MySTL::construct(ptr, std::move(value)); // 移动构造
     }
 
     template<class T>

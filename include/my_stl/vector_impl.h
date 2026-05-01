@@ -1,6 +1,8 @@
 #ifndef _VECTOR_IMPL_H_
 #define _VECTOR_IMPL_H_
 
+#include <stdexcept>
+
 #include "typeTraits.h"
 #include "allocator.h"
 #include "iterator.h"
@@ -160,6 +162,27 @@ namespace MySTL
             insert_aux(finish_, value);
         }
     }
+    // push_back: 移动语义尾部插入
+    template <class T, class Alloc>
+    void vector<T, Alloc>::push_back(value_type&& value)
+    {
+        if (start_ == nullptr)
+        {
+            start_ = dataAllocator::allocate(1);
+            dataAllocator::construct(start_, std::move(value));
+            finish_ = start_ + 1;
+            endOfStorage_ = finish_;
+        }
+        else if (endOfStorage_ != finish_)
+        {
+            dataAllocator::construct(finish_, std::move(value));
+            finish_++;
+        }
+        else
+        {
+            insert_aux(finish_, std::move(value));
+        }
+    }
     // pop_back: 尾部弹出
     template <class T, class Alloc>
     void vector<T, Alloc>::pop_back()
@@ -240,6 +263,48 @@ namespace MySTL
         else
         {
             insert_aux(position, position + 1, value);
+        }
+    }
+    // insert_aux: 在position前插入单值（移动语义）
+    template <class T, class Alloc>
+    void vector<T, Alloc>::insert_aux(iterator position, value_type&& value)
+    {
+        if (finish_ != endOfStorage_)
+        {
+            // 空间够: 尾部 move-construct, 中间右移, 填入新值
+            dataAllocator::construct(finish_, std::move(*(finish_ - 1)));
+            finish_++;
+            // 手动 move_backward: [position, finish_-2) → [position+1, finish_-1)
+            for (iterator i = finish_ - 1; i > position; --i)
+                *i = std::move(*(i - 1));
+            *position = std::move(value);
+        }
+        else
+        {
+            // 扩容: 新空间逐元素 move-construct
+            const size_type old_size = size();
+            const size_type new_size = old_size * 2;
+            iterator new_start_ = dataAllocator::allocate(new_size);
+            iterator new_finish_ = new_start_;
+            try
+            {
+                for (iterator it = start_; it != position; ++it, ++new_finish_)
+                    dataAllocator::construct(new_finish_, std::move(*it));
+                dataAllocator::construct(new_finish_, std::move(value));
+                ++new_finish_;
+                for (iterator it = position; it != finish_; ++it, ++new_finish_)
+                    dataAllocator::construct(new_finish_, std::move(*it));
+            }
+            catch (...)
+            {
+                dataAllocator::destroy(new_start_, new_finish_);
+                dataAllocator::deallocate(new_start_, new_size);
+                throw;
+            }
+            deallocate();
+            start_ = new_start_;
+            finish_ = new_finish_;
+            endOfStorage_ = new_start_ + new_size;
         }
     }
     // insert_aux: 在区间 [first, last) 前插入n个value（内部辅助函数，含扩容逻辑）

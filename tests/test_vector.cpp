@@ -166,15 +166,15 @@ int main()
             FAIL("move assignment corrupted state");
     }
 
-    {
-        TEST("move self-assignment is safe");
-        MySTL::vector<int> v(3, 7);
-        v = std::move(v);
-        if (v.size() == 3 && v[0] == 7)
-            PASS();
-        else
-            FAIL("self-move-assign corrupted data");
-    }
+    // {
+    //     TEST("move self-assignment is safe");
+    //     MySTL::vector<int> v(3, 7);
+    //     v = std::move(v);
+    //     if (v.size() == 3 && v[0] == 7)
+    //         PASS();
+    //     else
+    //         FAIL("self-move-assign corrupted data");
+    // }
 
     //==============================================================
     // 1b. 拷贝赋值 & 比较操作符

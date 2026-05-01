@@ -1,0 +1,15 @@
+/tmp/my_stl_install/include/my_stl/construct.h
+/tmp/my_stl_install/include/my_stl/iterator.h
+/tmp/my_stl_install/include/my_stl/vector.h
+/tmp/my_stl_install/include/my_stl/skip_list_impl.h
+/tmp/my_stl_install/include/my_stl/skip_list.h
+/tmp/my_stl_install/include/my_stl/alloc.h
+/tmp/my_stl_install/include/my_stl/vector_impl.h
+/tmp/my_stl_install/include/my_stl/uninitialized.h
+/tmp/my_stl_install/include/my_stl/allocator.h
+/tmp/my_stl_install/include/my_stl/typeTraits.h
+/tmp/my_stl_install/include/my_stl/algorithm.h
+/tmp/my_stl_install/include/my_stl/concurrent_allocator.h
+/tmp/my_stl_install/lib/cmake/my_stl/my_stlTargets.cmake
+/tmp/my_stl_install/lib/cmake/my_stl/my_stlConfig.cmake
+/tmp/my_stl_install/lib/cmake/my_stl/my_stlConfigVersion.cmake

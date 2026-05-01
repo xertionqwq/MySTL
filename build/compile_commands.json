@@ -10,5 +10,11 @@
   "command": "/usr/bin/g++  -I/home/xertion/Code/My_STL/include  -Wall -Wextra -g -fsanitize=address -g -std=c++17 -o CMakeFiles/test_vector.dir/test_vector.cpp.o -c /home/xertion/Code/My_STL/tests/test_vector.cpp",
   "file": "/home/xertion/Code/My_STL/tests/test_vector.cpp",
   "output": "tests/CMakeFiles/test_vector.dir/test_vector.cpp.o"
+},
+{
+  "directory": "/home/xertion/Code/My_STL/build/tests",
+  "command": "/usr/bin/g++  -I/home/xertion/Code/My_STL/include  -Wall -Wextra -g -fsanitize=address -g -std=c++17 -o CMakeFiles/test_skip_list.dir/test_skip_list.cpp.o -c /home/xertion/Code/My_STL/tests/test_skip_list.cpp",
+  "file": "/home/xertion/Code/My_STL/tests/test_skip_list.cpp",
+  "output": "tests/CMakeFiles/test_skip_list.dir/test_skip_list.cpp.o"
 }
 ]
