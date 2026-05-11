@@ -12,3 +12,7 @@ output/
 O_tinySTL
 
 # plan of structure
+
+# CMake
+build
+
