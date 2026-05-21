@@ -2,10 +2,10 @@
 #define _UNINITIALIZED_H_
 #pragma once
 
-#include "construct.h"
-#include "algorithm.h"
-#include "typeTraits.h"
-#include "iterator.h"
+#include "my_stl/core/construct.h"
+#include "my_stl/core/algorithm.h"
+#include "my_stl/core/typeTraits.h"
+#include "my_stl/core/iterator.h"
 
 namespace MySTL
 {

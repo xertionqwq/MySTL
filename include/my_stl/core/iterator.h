@@ -32,8 +32,8 @@ namespace MySTL
         using iterator_category = Category;
         using value_type = T;
         using difference_type = Distance;
-        using pointer = T *;
-        using reference = T &;
+        using pointer = Pointer;
+        using reference = Reference;
     };
 
     template <class T, class Distance>

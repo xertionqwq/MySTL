@@ -3,10 +3,10 @@
 
 #include <stdexcept>
 
-#include "typeTraits.h"
-#include "allocator.h"
-#include "iterator.h"
-#include "uninitialized.h"
+#include "my_stl/core/typeTraits.h"
+#include "my_stl/core/allocator.h"
+#include "my_stl/core/iterator.h"
+#include "my_stl/core/uninitialized.h"
 
 namespace MySTL
 {

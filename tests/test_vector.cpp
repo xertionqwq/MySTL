@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cassert>
-#include "my_stl/vector.h"
+#include "my_stl/containers/vector.h"
 
 // 测试辅助：统计成功/失败
 static int passed = 0;

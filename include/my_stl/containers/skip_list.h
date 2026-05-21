@@ -2,7 +2,7 @@
 #define _SKIP_LIST_H_
 #pragma once
 
-#include "concurrent_allocator.h"
+#include "my_stl/core/concurrent_allocator.h"
 
 #include <atomic>
 #include <cstddef>
@@ -56,9 +56,16 @@ namespace MySTL
         V*        find(const K& key);           // 无锁, acquire 读
         const V*  find(const K& key) const;     // 无锁, const 重载
         bool      insert(const K& key, const V& value);  // 乐观分配 + 锁
+        bool      upsert(const K& key, const V& value);  // 插入或覆盖, 乐观分配 + 锁
         bool      erase(const K& key);          // 锁内摘除
         bool      isempty() const { return size_.load(std::memory_order_relaxed) == 0; }
         size_type size()    const { return size_.load(std::memory_order_relaxed); }
+
+        void clear();
+
+        // 遍历: 按键升序遍历所有 KV 对 (level-0, 只读)
+        template <typename F>
+        void for_each(F&& callback) const;
 
     private:
         //-------- 内部辅助 --------
@@ -67,11 +74,10 @@ namespace MySTL
         static Node* createNode(const K& k, const V& v, int height);
         static Node* createHeadNode();
         static void destroyNode(Node* node);
-        void        clear();
     };
 
 }
 
-#include "skip_list_impl.h"
+#include "my_stl/detail/skip_list_impl.h"
 
 #endif

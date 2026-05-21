@@ -2,7 +2,7 @@
 #define _CONCURRENT_ALLOCATOR_H_
 
 #include <mutex>
-#include "alloc.h"
+#include "my_stl/core/alloc.h"
 
 namespace MySTL
 {

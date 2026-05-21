@@ -2,8 +2,8 @@
 #define _ALLOCATOR_H_
 #pragma once
 
-#include "alloc.h"
-#include "construct.h"
+#include "my_stl/core/alloc.h"
+#include "my_stl/core/construct.h"
 
 #include <cassert>
 #include <cstddef>
@@ -25,6 +25,12 @@ namespace MySTL{
         using const_reference = const T &;
         using difference_type = ptrdiff_t;
         using size_type = size_t;
+
+        template <class U>
+        struct rebind
+        {
+            using other = allocator<U>;
+        };
 
     public:
         //-------------分开空间分配与对象构造---------------

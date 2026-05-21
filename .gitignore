@@ -16,3 +16,9 @@ O_tinySTL
 # CMake
 build
 
+# IDE
+.vscode
+
+# bench
+bench
+

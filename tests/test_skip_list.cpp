@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cassert>
 #include <thread>
-#include "my_stl/skip_list.h"
-#include "my_stl/vector.h"
+#include "my_stl/containers/skip_list.h"
+#include "my_stl/containers/vector.h"
 
 static int passed = 0;
 static int failed = 0;

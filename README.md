@@ -3,8 +3,9 @@
 C++ STL 源码级复刻，参考侯捷《STL 源码剖析》。C++17，仅头文件，CMake 构建。
 
 ```cpp
-#include "my_stl/vector.h"
-MySTL::vector<int> v{1, 2, 3};
+#include "my_stl/containers/vector.h"   // 按需引用单个容器
+// 或 #include "my_stl/my_stl.h"        // 一把梭全量引用
+MySTL::vector<int> v(3, 42);
 v.push_back(4);
 ```
 
@@ -23,18 +24,22 @@ cd build && cmake .. && make -j$(nproc)   # 编译
 
 ```
 include/my_stl/
-├── alloc.h              # 二级空间配置器（内存池 + free-list）
-├── allocator.h          # 类型安全封装，分离分配与构造
-├── concurrent_allocator.h # 线程安全封装，对 alloc 加 std::mutex
-├── construct.h          # 对象构造/析构，基于 type_traits 分派
-├── typeTraits.h         # 型别特征萃取（POD 判断）
-├── iterator.h           # 迭代器萃取，五种标签
-├── uninitialized.h      # 批量初始化（copy / fill / fill_n）
-├── algorithm.h          # 基础算法（copy / copy_backward / fill / fill_n）
-├── vector.h             # vector 声明
-├── vector_impl.h        # vector 实现
-├── skip_list.h          # 跳表声明（线程安全）
-└── skip_list_impl.h     # 跳表实现
+├── core/
+│   ├── alloc.h              # 二级空间配置器（内存池 + free-list）
+│   ├── allocator.h          # 类型安全封装，分离分配与构造
+│   ├── concurrent_allocator.h # 线程安全封装，对 alloc 加 std::mutex
+│   ├── construct.h          # 对象构造/析构，基于 type_traits 分派
+│   ├── typeTraits.h         # 型别特征萃取（POD 判断）
+│   ├── iterator.h           # 迭代器萃取，五种标签
+│   ├── uninitialized.h      # 批量初始化（copy / fill / fill_n）
+│   └── algorithm.h          # 基础算法（copy / copy_backward / fill / fill_n）
+├── containers/
+│   ├── vector.h             # vector 声明
+│   └── skip_list.h          # 跳表声明（线程安全）
+├── detail/
+│   ├── vector_impl.h        # vector 实现
+│   └── skip_list_impl.h     # 跳表实现
+└── my_stl.h                 # umbrella header
 tests/
 ├── test_vector.cpp      # 54 用例
 ├── test_skip_list.cpp   # 20 用例

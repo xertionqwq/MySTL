@@ -6,8 +6,8 @@
 #include <initializer_list>
 #include <stdexcept>
 
-#include "allocator.h"
-#include "iterator.h"
+#include "my_stl/core/allocator.h"
+#include "my_stl/core/iterator.h"
 
 namespace MySTL
 {
@@ -101,6 +101,6 @@ namespace MySTL
     };
 };
 
-#include "vector_impl.h"
+#include "my_stl/detail/vector_impl.h"
 
 #endif

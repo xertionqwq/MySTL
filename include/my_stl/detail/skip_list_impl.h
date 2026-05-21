@@ -180,6 +180,61 @@ namespace MySTL
         return true;
     }
 
+    //======================== 插入或更新 ========================
+
+    template <class K, class V>
+    bool skip_list<K, V>::upsert(const K& key, const V& value)
+    {
+        int h = randomHeight();
+        Node* node = createNode(key, value, h);
+
+        Node* update[MAX_HEIGHT];
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+
+            if (findInternal(key, update))
+            {
+                // 键已存在: 原地更新 value, 释放预分配节点
+                Node* existing = update[0]->next_[0].load(std::memory_order_relaxed);
+                existing->value = value;
+                destroyNode(node);
+                return false;
+            }
+
+            if (h > maxHeight_)
+            {
+                for (int i = maxHeight_; i < h; ++i)
+                    update[i] = head_;
+                maxHeight_ = h;
+            }
+
+            for (int i = 0; i < h; ++i)
+            {
+                node->next_[i].store(
+                    update[i]->next_[i].load(std::memory_order_relaxed),
+                    std::memory_order_relaxed
+                );
+                update[i]->next_[i].store(node, std::memory_order_release);
+            }
+        }
+        size_.fetch_add(1, std::memory_order_relaxed);
+        return true;
+    }
+
+    //======================== 遍历 ========================
+
+    template <class K, class V>
+    template <typename F>
+    void skip_list<K, V>::for_each(F&& callback) const
+    {
+        Node* cur = head_->next_[0].load(std::memory_order_acquire);
+        while (cur)
+        {
+            callback(cur->key, cur->value);
+            cur = cur->next_[0].load(std::memory_order_acquire);
+        }
+    }
+
     //======================== 删除 ========================
 
     template <class K, class V>
