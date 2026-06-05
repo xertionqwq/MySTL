@@ -3,13 +3,27 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <malloc.h>
 #include <string>
 #include <vector>
 
+#if defined(__linux__)
+#include <malloc.h>
 #include <unistd.h>
+#elif defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <psapi.h>
+#endif
 
 #include "my_stl/containers/vector.h"
+
+#if defined(_MSC_VER)
+#define MYSTL_NOINLINE __declspec(noinline)
+#else
+#define MYSTL_NOINLINE __attribute__((noinline))
+#endif
 
 // ============================================================
 // Test structs — 10 sizes → freelist buckets 8..128
@@ -35,8 +49,7 @@ struct S128 { int v{}; char pad[124]{}; };
 static long g_sink = 0;  // volatile-like: write visible to external observers
 
 template <typename T>
-__attribute__((noinline))
-static void touch_vec(const T& v) {
+MYSTL_NOINLINE static void touch_vec(const T& v) {
     // Sum element v fields so the compiler must materialize the data.
     // noinline prevents the compiler from seeing into this call.
     for (std::size_t i = 0; i < v.size(); ++i)
@@ -80,11 +93,20 @@ static double run_std(int batches, int per_batch) {
 // ============================================================
 
 static long rss_kb() {
+#if defined(__linux__)
     std::ifstream f("/proc/self/statm");
     long rss = 0;
     f.ignore(32, ' ');      // skip "size" field
     f >> rss;
     return rss * static_cast<long>(sysconf(_SC_PAGESIZE)) / 1024;
+#elif defined(_WIN32)
+    PROCESS_MEMORY_COUNTERS pmc{};
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
+        return static_cast<long>(pmc.WorkingSetSize / 1024);
+    return -1;
+#else
+    return -1;
+#endif
 }
 
 // ============================================================
@@ -92,10 +114,14 @@ static long rss_kb() {
 // ============================================================
 
 static void heap_dump(const char* label) {
+#if defined(__linux__)
     char path[128];
     std::snprintf(path, sizeof(path), "/tmp/bench_heap_%s.xml", label);
     FILE* f = std::fopen(path, "w");
     if (f) { malloc_info(0, f); std::fclose(f); }
+#else
+    (void)label;
+#endif
 }
 
 // ============================================================

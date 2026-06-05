@@ -1,5 +1,8 @@
 add_executable(bench_allocator bench_allocator.cpp)
 target_link_libraries(bench_allocator PRIVATE my_stl)
+if(WIN32)
+    target_link_libraries(bench_allocator PRIVATE psapi)
+endif()
 
 # Benchmark: optimisation on, sanitizers off (last-wins overrides -fsanitize=address
 # from parent CMAKE_CXX_FLAGS, both for compile and link)
