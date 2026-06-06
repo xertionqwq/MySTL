@@ -51,7 +51,7 @@ namespace MySTL
         static char *chunkAlloc(size_t size, size_t &nobjs);
         static char *startFree; // 内存池起始位置, 只在chunk_alloc()中变化
         static char *endFree;   // 与上同理
-        static size_t heapSize;
+        static size_t heapSize; // 已经从系统申请过的总量
 
     public:
         // 负责内存分配释放
