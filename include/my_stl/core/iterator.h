@@ -126,6 +126,7 @@ namespace MySTL
     iterator_category(const Iterator &It)
     {
         using category = typename iterator_traits<Iterator>::iterator_category;
+        (void)It;
         return category();
     }
     // 与上同理
@@ -133,6 +134,7 @@ namespace MySTL
     inline typename iterator_traits<Iterator>::iterator_category
     value_type(const Iterator &It)
     {
+        (void)It;
         return static_cast<typename iterator_traits<Iterator>::value_type *>(nullptr);
     }
     // 与上同理
@@ -140,6 +142,7 @@ namespace MySTL
     inline typename iterator_traits<Iterator>::difference_type
     difference_type(const Iterator &It)
     {
+        (void)It;
         return static_cast<typename iterator_traits<Iterator>::difference_type *>(nullptr);
     }
 };
