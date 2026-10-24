@@ -36,7 +36,7 @@ doc/learning-log/
 | 编号 | 主题 | 目标文档 | 笔记 | 状态 |
 |------|------|----------|------|------|
 | 01 | C++ 基础与对象生命周期 | — | [01-cpp-basics.md](notes/01-cpp-basics.md) | ✅ 已完成 |
-| 02 | 空间配置器 alloc | [02-allocator.md](targets/02-allocator.md) | — | ⬜ 待开始 |
+| 02 | 空间配置器 alloc | — | [02-allocator.md](notes/02-allocator.md) | ✅ 已完成 |
 | 03 | 模板萃取 / 迭代器 / 构造与算法 | [03-traits-iterators.md](targets/03-traits-iterators.md) | — | ⬜ 待开始 |
 | 04 | vector 完整实现 | [04-vector.md](targets/04-vector.md) | — | ⬜ 待开始 |
 | 05 | list | — | — | ⏸ 待规划 |
