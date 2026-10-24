@@ -17,10 +17,10 @@ namespace MySTL
     class alloc
     {
     private:
-        static constexpr size_t ALIGN = 8;
-        static constexpr size_t MAXBYTES = 128;
-        static constexpr size_t NFREELISTS = MAXBYTES / ALIGN;
-        static constexpr size_t NOBJS = 20;
+        static constexpr size_t ALIGN = 8;                     // 8 字节对齐
+        static constexpr size_t MAXBYTES = 128;                // 最大限制 128 字节
+        static constexpr size_t NFREELISTS = MAXBYTES / ALIGN; // 16 个自由链表
+        static constexpr size_t NOBJS = 20;                    // refill 默认分配的区块数
 
     private:
         // free-lists的节点构造, 零额外开销
@@ -51,7 +51,7 @@ namespace MySTL
         static char *chunkAlloc(size_t size, size_t &nobjs);
         static char *startFree; // 内存池起始位置, 只在chunk_alloc()中变化
         static char *endFree;   // 与上同理
-        static size_t heapSize; // 已经从系统申请过的总量
+        static size_t heapSize; // 累计向系统申请过的字节数, 仅用于计算增长补偿
 
     public:
         // 负责内存分配释放
@@ -83,7 +83,8 @@ namespace MySTL
     template <bool threads, int inst>
     typename alloc<threads, inst>::obj *alloc<threads, inst>::freeList[] = {
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+    };
 
     // 内存分配实现
     template <bool threads, int inst>
@@ -156,27 +157,20 @@ namespace MySTL
             return chunk;
 
         // 否则调整freeList, 纳入新节点
-        myFreeList = freeList + FREELIST_INDEX(bytes);
+        myFreeList = freeList + FREELIST_INDEX(bytes); // 先找链表开头
 
         result = reinterpret_cast<obj *>(chunk); // 这块还给用户
 
         // 引导freeList指向新配置的空间(由内存池而来)
-        *myFreeList = nextObj = reinterpret_cast<obj *>(chunk + bytes);
+        *myFreeList = nextObj = reinterpret_cast<obj *>(chunk + bytes); // 移动一个节点, 因为开头的节点要给用户
         // 串接个节点
-        for (size_t i = 1;; i++)
-        { // 从1开始, 0返回给用户
+        for (size_t i = 1; i < nobjs; i++) // 从1开始, 0返回给用户
+        { 
             currentObj = nextObj;
-            nextObj = reinterpret_cast<obj *>(reinterpret_cast<char *>(nextObj) + bytes);
-            if (nobjs - 1 == i)
-            {
-                currentObj->next = nullptr;
-                break;
-            }
-            else
-            {
-                currentObj->next = nextObj;
-            }
+            nextObj = reinterpret_cast<obj *>(reinterpret_cast<char *>(nextObj) + bytes); // nxt 移动
+            currentObj->next = nextObj; // 串接
         }
+        currentObj->next = nullptr; // 将最后一个节点后驱置空
 
         return result;
     }
@@ -191,7 +185,7 @@ namespace MySTL
 
         if (static_cast<size_t>(bytesLeft) >= totalBytes)
         {
-            // 剩余空间完全满足需求量
+            // 剩余空间完全满足需求量, 仅做指针移动
             result = startFree;
             startFree += totalBytes;
             return result;
@@ -201,6 +195,7 @@ namespace MySTL
             // 剩余空间不满足, 但可供应一个以上的区块
             nobjs = bytesLeft / bytes; // 分不出20个了， 改变nojbs
             totalBytes = nobjs * bytes;
+            // 还是能分配, 仅做指针移动
             result = startFree;
             startFree += totalBytes;
             return result;
